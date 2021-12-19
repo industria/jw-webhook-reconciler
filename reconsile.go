@@ -1,13 +1,14 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 )
 
 func usage() {
-	fmt.Printf("Usage: %s <command> arguments.. \n", os.Args[0])
+	fmt.Printf("Usage: %s arguments <command> \n", os.Args[0])
 	fmt.Printf("  command : list, diff or apply\n\n")
 	flag.PrintDefaults()
 }
@@ -34,15 +35,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	if !validCommand(flag.Arg(0)) {
-		fmt.Printf("Unknown command %s", flag.Arg(0))
+	cmd := flag.Args()[0]
+	if !validCommand(cmd) {
+		fmt.Printf("Unknown command %s \n", cmd)
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	fmt.Println("Arguments left", flag.NArg())
+	var _, err = os.Stat(*spec)
+	if errors.Is(err, os.ErrNotExist) {
+		fmt.Printf("File %s not found\n", *spec)
+		os.Exit(1)
+	}
 
-	//args := os.Args
 	fmt.Println("Specification file:", *spec)
 	fmt.Println("Show ids:", *showIds)
 	fmt.Println("Secret:", *secret)
