@@ -1,0 +1,44 @@
+{
+    "prod-eb-plus": {
+        "description": "Ekstra Bladet - Premium content",
+        "events": ["media_available","media_deleted","media_updated"],
+        "site_ids": ["lJsshwpV"],
+        "endpoint": "https://video.ekstrabladet.services/jw/callback"
+    },
+    "prod-eb-discovery": {
+        "description": "Ekstra Bladet - Discovery content",
+        "events": ["media_available","media_deleted","media_updated"],
+        "site_ids": ["XdCPvVUl"],
+        "endpoint": "https://video.ekstrabladet.services/jw/callback"
+    },
+    "prod-eb-ekstrabladet": {
+        "description": "Ekstra Bladet - production",
+        "events": ["media_available","media_deleted","media_updated"],
+        "site_ids": ["2MQYxesl", "YfgoXza5"],
+        "endpoint": "https://video.ekstrabladet.services/jw/callback"
+    },
+    "prod-eb-content": {
+        "description": "eb-content - production callbacks",
+        "events": ["media_available","media_deleted","media_updated"],
+        "site_ids": ["xasHRezt"],
+        "endpoint": "https://video.ekstrabladet.services/jw/callback"
+    },
+    "test-eb-content": {
+        "description": "eb-content - test callbacks",
+        "events": ["conversions_complete","media_available","media_deleted","media_reuploaded","media_updated"],
+        "site_ids": ["QvdEJfyQ"],
+        "endpoint": "https://video.test-ekstrabladet.services/jw/callback"
+    },
+    "test-eb-discovery": {
+        "description": "Discovery - test callbacks",
+        "events": ["media_available","media_deleted","media_reuploaded","media_updated"],
+        "site_ids": ["1wZSAgoz"],
+        "endpoint": "https://video.test-ekstrabladet.services/jw/callback"
+    },
+    "test-eb": {
+        "description": "Ekstra Bladet - test callbacks web-tv and Stand Alone Video",
+        "events": ["media_available","media_deleted","media_reuploaded","media_updated", "channel_active", "channel_created", "channel_idle"],
+        "site_ids": ["GoVfRhC2", "LQnPbUG3"],
+        "endpoint": "https://video.test-ekstrabladet.services/jw/callback"
+    }
+}
