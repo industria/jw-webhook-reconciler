@@ -7,10 +7,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"text/tabwriter"
 )
 
 // Hand the JSON used uppercase the suffixes would not be needed
-type WebhookDefinition struct {
+type WebhookDeclaration struct {
 	Description string   `json:"description"`
 	Events      []string `json:"events"`
 	Site_ids    []string `json:"site_ids"`
@@ -64,13 +65,36 @@ func main() {
 		os.Exit(1)
 	}
 
-	var definitions map[string]WebhookDefinition
-	json.Unmarshal([]byte(f), &definitions)
-
-	fmt.Println(definitions)
+	var declarations map[string]WebhookDeclaration
+	json.Unmarshal([]byte(f), &declarations)
+	if nil != declarations {
+		fmt.Println("Spec read")
+		//fmt.Println(definitions)
+	}
 
 	fmt.Println("Specification file:", *spec)
 	fmt.Println("Show ids:", *showIds)
 	fmt.Println("Secret:", *secret)
+
+	Setup(*secret)
+	res, err := WebhooksDefinitions()
+	if err != nil {
+		fmt.Printf("Failed to get the webhooks from JW service \n")
+		os.Exit(1)
+	}
+
+	if cmd == "list" {
+		const padding = 3
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.Debug)
+		fmt.Fprintf(w, "Id\tName\tURL\tSites\tEvents  \n")
+
+		for _, definition := range res {
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t \n", definition.Id, definition.MetaData.Name, definition.MetaData.Url, definition.MetaData.SiteIds, definition.MetaData.Events)
+		}
+		w.Flush()
+	} else {
+		fmt.Printf("Unknown command %s\n", cmd)
+
+	}
 
 }
