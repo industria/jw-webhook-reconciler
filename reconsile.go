@@ -48,9 +48,34 @@ func definitionInDeclarations(definition WebhookDefinition, declarations []Decla
 	return false
 }
 
-func different(match match) bool {
-	// TODO: compare
+func contains(x string, ys []string) bool {
+	for _, y := range ys {
+		if x == y {
+			return true
+		}
+	}
 	return false
+}
+
+// Equal if arrays are equal size and all of xs are found in ys
+func equalsIgnoreOrder(xs []string, ys []string) bool {
+	if len(xs) != len(ys) {
+		return false
+	}
+	for _, x := range xs {
+		if !contains(x, ys) {
+			return false
+		}
+	}
+	return true
+}
+
+func different(match match) bool {
+	// They are different if declaration description, events, sites or endpoint
+	// differ from the same data in the definition
+	return match.declaration.description != match.definition.MetaData.Description || match.declaration.endpoint != match.definition.MetaData.Url ||
+		!equalsIgnoreOrder(match.declaration.events, match.definition.MetaData.Events) ||
+		!equalsIgnoreOrder(match.declaration.siteIds, match.definition.MetaData.SiteIds)
 }
 
 func changeSet(declarations []Declaration, definitions []WebhookDefinition) *changeset {
@@ -127,10 +152,6 @@ func main() {
 		fmt.Printf("err: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("Declarations file:", declarations)
-
-	fmt.Println("Specification file:", *spec)
-	fmt.Println("Secret:", *secret)
 
 	Setup(*secret)
 	definitions, err := WebhooksDefinitions()
@@ -149,7 +170,6 @@ func main() {
 		}
 		w.Flush()
 	} else if cmd == "diff" {
-
 		changeset := changeSet(declarations, definitions)
 		fmt.Println("Create:")
 		fmt.Println(changeset.create)
@@ -160,6 +180,14 @@ func main() {
 		fmt.Println("Delete:")
 		fmt.Println(changeset.delete)
 
+	} else if cmd == "apply" {
+		changeset := changeSet(declarations, definitions)
+		for _, declaration := range changeset.create {
+			err = CreateWebhook(declaration)
+			if err != nil {
+				fmt.Printf("Failed to create declaration for %s error: %v \n", declaration.name, err)
+			}
+		}
 	} else {
 		fmt.Printf("Unknown command %s\n", cmd)
 	}

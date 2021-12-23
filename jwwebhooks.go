@@ -33,6 +33,10 @@ type WebhookResponse struct {
 	Webhooks   []WebhookDefinition `json:"webhooks"`
 }
 
+type WebhookCreatePatch struct {
+	Metadata WebhookMetadata `json:"metadata"`
+}
+
 var secret = ""
 
 const service_url = "https://api.jwplayer.com/v2/webhooks/"
@@ -84,4 +88,40 @@ func WebhooksDefinitions() ([]WebhookDefinition, error) {
 	}
 
 	return webhooks.Webhooks, nil
+}
+
+func CreateWebhook(declaration Declaration) error {
+
+	metadata := WebhookMetadata{declaration.description, declaration.events, declaration.name, declaration.siteIds, declaration.endpoint}
+	create := WebhookCreatePatch{metadata}
+
+	b, err := json.Marshal(create)
+	if err != nil {
+		return err
+	}
+	// TODO: b is basically what we nned to post
+
+	fmt.Println(string(b))
+	return nil
+}
+
+func UpdateWebhook(declaration Declaration) error {
+
+	metadata := WebhookMetadata{declaration.description, declaration.events, declaration.name, declaration.siteIds, declaration.endpoint}
+	update := WebhookCreatePatch{metadata}
+
+	b, err := json.Marshal(update)
+	if err != nil {
+		return err
+	}
+	// TODO: b is basically what we nned to Patch
+
+	fmt.Println(string(b))
+	return nil
+}
+
+func DeleteWebhook(declaration Declaration) error {
+
+	// TODO delete to url
+	return nil
 }

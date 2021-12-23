@@ -31,13 +31,13 @@ func Declarations(declarationFile string) ([]Declaration, error) {
 
 	f, err := ioutil.ReadFile(declarationFile)
 	if err != nil {
-		return result, fmt.Errorf("Failed to read %s", declarationFile)
+		return result, fmt.Errorf("failed to read %s", declarationFile)
 	}
 
 	var declarations map[string]webhookDeclaration
 	err = json.Unmarshal([]byte(f), &declarations)
 	if err != nil {
-		return result, fmt.Errorf("Failed to parse %s", declarationFile)
+		return result, fmt.Errorf("failed to parse %s", declarationFile)
 	}
 
 	for name, decl := range declarations {
