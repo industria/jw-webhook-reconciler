@@ -112,6 +112,11 @@ func CreateWebhook(declaration Declaration) error {
 	}
 	defer res.Body.Close()
 
+	_, err = io.Copy(ioutil.Discard, res.Body) // Throw away the body which must be read to EOF
+	if err != nil {
+		return err
+	}
+
 	if res.StatusCode != 201 {
 		return fmt.Errorf("webhook declaration %v not created, service returend statuscode %d", declaration, res.StatusCode)
 	}
@@ -140,6 +145,11 @@ func UpdateWebhook(id string, declaration Declaration) error {
 	}
 	defer res.Body.Close()
 
+	_, err = io.Copy(ioutil.Discard, res.Body) // Throw away the body which must be read to EOF
+	if err != nil {
+		return err
+	}
+
 	if res.StatusCode != 200 {
 		return fmt.Errorf("webhook declaration %v not updated, service returend statuscode %d", declaration, res.StatusCode)
 	}
@@ -157,6 +167,11 @@ func DeleteWebhook(id string) error {
 		return err
 	}
 	defer res.Body.Close()
+
+	_, err = io.Copy(ioutil.Discard, res.Body) // Throw away the body which must be read to EOF
+	if err != nil {
+		return err
+	}
 
 	if res.StatusCode != 204 {
 		return fmt.Errorf("webhook id %s not deleted, service returend statuscode %d", id, res.StatusCode)
