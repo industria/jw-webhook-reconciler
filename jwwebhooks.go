@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -43,8 +45,8 @@ const service_url = "https://api.jwplayer.com/v2/webhooks/"
 
 var jwClient = &http.Client{Timeout: time.Second * 10}
 
-func createRequest(method string) (*http.Request, error) {
-	req, err := http.NewRequest(method, service_url, nil)
+func createRequest(method string, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, body)
 	if nil != err {
 		return nil, err
 	}
@@ -59,7 +61,7 @@ func Setup(apiSecret string) {
 }
 
 func WebhooksDefinitions() ([]WebhookDefinition, error) {
-	req, err := createRequest("GET")
+	req, err := createRequest("GET", service_url, nil)
 	if nil != err {
 		return []WebhookDefinition{}, err
 	}
@@ -99,13 +101,25 @@ func CreateWebhook(declaration Declaration) error {
 	if err != nil {
 		return err
 	}
-	// TODO: b is basically what we nned to post
 
-	fmt.Println(string(b))
+	req, err := createRequest("POST", service_url, bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	res, err := jwClient.Do(req)
+	if nil != err {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 201 {
+		return fmt.Errorf("webhook declaration %v not created, service returend statuscode %d", declaration, res.StatusCode)
+	}
+
 	return nil
 }
 
-func UpdateWebhook(declaration Declaration) error {
+func UpdateWebhook(id string, declaration Declaration) error {
 
 	metadata := WebhookMetadata{declaration.description, declaration.events, declaration.name, declaration.siteIds, declaration.endpoint}
 	update := WebhookCreatePatch{metadata}
@@ -114,14 +128,38 @@ func UpdateWebhook(declaration Declaration) error {
 	if err != nil {
 		return err
 	}
-	// TODO: b is basically what we nned to Patch
 
-	fmt.Println(string(b))
+	patchUrl := service_url + id + "/"
+	req, err := createRequest("PATCH", patchUrl, bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	res, err := jwClient.Do(req)
+	if nil != err {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("webhook declaration %v not updated, service returend statuscode %d", declaration, res.StatusCode)
+	}
 	return nil
 }
 
-func DeleteWebhook(declaration Declaration) error {
+func DeleteWebhook(id string) error {
+	deleteUrl := service_url + id + "/"
+	req, err := createRequest("DELETE", deleteUrl, nil)
+	if err != nil {
+		return err
+	}
+	res, err := jwClient.Do(req)
+	if nil != err {
+		return err
+	}
+	defer res.Body.Close()
 
-	// TODO delete to url
+	if res.StatusCode != 204 {
+		return fmt.Errorf("webhook id %s not deleted, service returend statuscode %d", id, res.StatusCode)
+	}
 	return nil
 }

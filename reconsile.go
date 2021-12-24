@@ -28,7 +28,7 @@ func declarationInDefinitions(declaration Declaration, definitions []WebhookDefi
 	return false
 }
 
-var DefinitionNotFound = errors.New("DefinitionNotFound")
+var ErrDefinitionNotFound = errors.New("DefinitionNotFound")
 
 func findDefinitionFromDeclaration(declaration Declaration, definitions []WebhookDefinition) (match, error) {
 	for _, definition := range definitions {
@@ -36,7 +36,7 @@ func findDefinitionFromDeclaration(declaration Declaration, definitions []Webhoo
 			return match{declaration, definition}, nil
 		}
 	}
-	return match{}, DefinitionNotFound
+	return match{}, ErrDefinitionNotFound
 }
 
 func definitionInDeclarations(definition WebhookDefinition, declarations []Declaration) bool {
@@ -186,6 +186,18 @@ func main() {
 			err = CreateWebhook(declaration)
 			if err != nil {
 				fmt.Printf("Failed to create declaration for %s error: %v \n", declaration.name, err)
+			}
+		}
+		for _, match := range changeset.modify {
+			err = UpdateWebhook(match.definition.Id, match.declaration)
+			if err != nil {
+				fmt.Printf("Failed to update declaration for %s error: %v \n", match.declaration.name, err)
+			}
+		}
+		for _, definition := range changeset.delete {
+			err = DeleteWebhook(definition.Id)
+			if err != nil {
+				fmt.Printf("Failed to delete definition for %s error: %v \n", definition.MetaData.Name, err)
 			}
 		}
 	} else {

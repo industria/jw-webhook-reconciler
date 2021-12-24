@@ -41,4 +41,12 @@
         "site_ids": ["GoVfRhC2", "LQnPbUG3"],
         "endpoint": "https://video.test-ekstrabladet.services/jw/callback"
     }
+
+    ,"demo": {
+        "description": "demo eb-content",
+        "events": ["conversions_complete","media_available"],
+        "site_ids": ["QvdEJfyQ"],
+        "endpoint": "https://video.test-ekstrabladet.services/jw/callback"
+    }
+
 }
