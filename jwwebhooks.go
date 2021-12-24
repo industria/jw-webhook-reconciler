@@ -39,29 +39,33 @@ type WebhookCreatePatch struct {
 	Metadata WebhookMetadata `json:"metadata"`
 }
 
-var secret = ""
+type Webhooks struct {
+	secret     string
+	serviceURL string
+	httpClient *http.Client
+}
 
-const service_url = "https://api.jwplayer.com/v2/webhooks/"
+func newWebhooks(secret string) *Webhooks {
+	return &Webhooks{
+		secret:     secret,
+		serviceURL: "https://api.jwplayer.com/v2/webhooks/",
+		httpClient: &http.Client{Timeout: time.Second * 10},
+	}
+}
 
-var jwClient = &http.Client{Timeout: time.Second * 10}
-
-func createRequest(method string, url string, body io.Reader) (*http.Request, error) {
+func (w *Webhooks) request(method string, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if nil != err {
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+secret)
+	req.Header.Add("Authorization", "Bearer "+w.secret)
 	return req, err
 }
 
-func Setup(apiSecret string) {
-	secret = apiSecret
-}
-
-func WebhooksDefinitions() ([]WebhookDefinition, error) {
-	req, err := createRequest("GET", service_url, nil)
+func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
+	req, err := w.request("GET", w.serviceURL, nil)
 	if nil != err {
 		return []WebhookDefinition{}, err
 	}
@@ -70,7 +74,7 @@ func WebhooksDefinitions() ([]WebhookDefinition, error) {
 	q.Add("page_length", "250")
 	req.URL.RawQuery = q.Encode()
 
-	res, err := jwClient.Do(req)
+	res, err := w.httpClient.Do(req)
 	if nil != err {
 		return []WebhookDefinition{}, err
 	}
@@ -92,8 +96,7 @@ func WebhooksDefinitions() ([]WebhookDefinition, error) {
 	return webhooks.Webhooks, nil
 }
 
-func CreateWebhook(declaration Declaration) error {
-
+func (w *Webhooks) create(declaration Declaration) error {
 	metadata := WebhookMetadata{declaration.description, declaration.events, declaration.name, declaration.siteIds, declaration.endpoint}
 	create := WebhookCreatePatch{metadata}
 
@@ -102,11 +105,11 @@ func CreateWebhook(declaration Declaration) error {
 		return err
 	}
 
-	req, err := createRequest("POST", service_url, bytes.NewReader(b))
+	req, err := w.request("POST", w.serviceURL, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
-	res, err := jwClient.Do(req)
+	res, err := w.httpClient.Do(req)
 	if nil != err {
 		return err
 	}
@@ -124,8 +127,7 @@ func CreateWebhook(declaration Declaration) error {
 	return nil
 }
 
-func UpdateWebhook(id string, declaration Declaration) error {
-
+func (w *Webhooks) update(id string, declaration Declaration) error {
 	metadata := WebhookMetadata{declaration.description, declaration.events, declaration.name, declaration.siteIds, declaration.endpoint}
 	update := WebhookCreatePatch{metadata}
 
@@ -134,12 +136,12 @@ func UpdateWebhook(id string, declaration Declaration) error {
 		return err
 	}
 
-	patchUrl := service_url + id + "/"
-	req, err := createRequest("PATCH", patchUrl, bytes.NewReader(b))
+	patchUrl := w.serviceURL + id + "/"
+	req, err := w.request("PATCH", patchUrl, bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
-	res, err := jwClient.Do(req)
+	res, err := w.httpClient.Do(req)
 	if nil != err {
 		return err
 	}
@@ -156,13 +158,13 @@ func UpdateWebhook(id string, declaration Declaration) error {
 	return nil
 }
 
-func DeleteWebhook(id string) error {
-	deleteUrl := service_url + id + "/"
-	req, err := createRequest("DELETE", deleteUrl, nil)
+func (w *Webhooks) delete(id string) error {
+	deleteUrl := w.serviceURL + id + "/"
+	req, err := w.request("DELETE", deleteUrl, nil)
 	if err != nil {
 		return err
 	}
-	res, err := jwClient.Do(req)
+	res, err := w.httpClient.Do(req)
 	if nil != err {
 		return err
 	}

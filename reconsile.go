@@ -153,8 +153,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	Setup(*secret)
-	definitions, err := WebhooksDefinitions()
+	webhooks := newWebhooks(*secret)
+	//	Setup(*secret)
+	definitions, err := webhooks.definitions() //WebhooksDefinitions()
 	if err != nil {
 		fmt.Printf("Failed to get the webhooks from JW service \n")
 		os.Exit(1)
@@ -183,19 +184,19 @@ func main() {
 	} else if cmd == "apply" {
 		changeset := changeSet(declarations, definitions)
 		for _, declaration := range changeset.create {
-			err = CreateWebhook(declaration)
+			err = webhooks.create(declaration)
 			if err != nil {
 				fmt.Printf("Failed to create declaration for %s error: %v \n", declaration.name, err)
 			}
 		}
 		for _, match := range changeset.modify {
-			err = UpdateWebhook(match.definition.Id, match.declaration)
+			err = webhooks.update(match.definition.Id, match.declaration)
 			if err != nil {
 				fmt.Printf("Failed to update declaration for %s error: %v \n", match.declaration.name, err)
 			}
 		}
 		for _, definition := range changeset.delete {
-			err = DeleteWebhook(definition.Id)
+			err = webhooks.delete(definition.Id)
 			if err != nil {
 				fmt.Printf("Failed to delete definition for %s error: %v \n", definition.MetaData.Name, err)
 			}
