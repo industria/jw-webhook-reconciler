@@ -120,7 +120,7 @@ func (w *Webhooks) create(declaration Declaration) error {
 		return err
 	}
 
-	if res.StatusCode != 201 {
+	if res.StatusCode != http.StatusCreated {
 		return fmt.Errorf("webhook declaration %v not created, service returend statuscode %d", declaration, res.StatusCode)
 	}
 
@@ -152,7 +152,7 @@ func (w *Webhooks) update(id string, declaration Declaration) error {
 		return err
 	}
 
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("webhook declaration %v not updated, service returend statuscode %d", declaration, res.StatusCode)
 	}
 	return nil
@@ -175,7 +175,7 @@ func (w *Webhooks) delete(id string) error {
 		return err
 	}
 
-	if res.StatusCode != 204 {
+	if res.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("webhook id %s not deleted, service returend statuscode %d", id, res.StatusCode)
 	}
 	return nil
