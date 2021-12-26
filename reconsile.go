@@ -147,15 +147,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	declarations, err := Declarations(*spec)
+	declarations, err := declarations(*spec)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		os.Exit(1)
 	}
 
 	webhooks := newWebhooks(*secret)
-	//	Setup(*secret)
-	definitions, err := webhooks.definitions() //WebhooksDefinitions()
+	definitions, err := webhooks.definitions()
 	if err != nil {
 		fmt.Printf("Failed to get the webhooks from JW service \n")
 		os.Exit(1)

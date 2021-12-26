@@ -89,7 +89,6 @@ func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	err = json.Unmarshal(b, &webhooks)
 	if nil != err {
 		fmt.Println("Spec read")
-		//fmt.Println(definitions)
 		return []WebhookDefinition{}, err
 	}
 
