@@ -67,7 +67,7 @@ func (w *Webhooks) request(method string, url string, body io.Reader) (*http.Req
 func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	req, err := w.request("GET", w.serviceURL, nil)
 	if err != nil {
-		return []WebhookDefinition{}, err
+		return nil, err
 	}
 	q := req.URL.Query()
 	q.Add("page", "1")
@@ -76,20 +76,19 @@ func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 
 	res, err := w.httpClient.Do(req)
 	if err != nil {
-		return []WebhookDefinition{}, err
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return []WebhookDefinition{}, err
+		return nil, err
 	}
 
 	var webhooks WebhookResponse
 	err = json.Unmarshal(b, &webhooks)
 	if err != nil {
-		fmt.Println("Spec read")
-		return []WebhookDefinition{}, err
+		return nil, err
 	}
 
 	return webhooks.Webhooks, nil
