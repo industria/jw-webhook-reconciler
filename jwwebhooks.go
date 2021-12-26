@@ -55,7 +55,7 @@ func newWebhooks(secret string) *Webhooks {
 
 func (w *Webhooks) request(method string, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
-	if nil != err {
+	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/json")
@@ -66,7 +66,7 @@ func (w *Webhooks) request(method string, url string, body io.Reader) (*http.Req
 
 func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	req, err := w.request("GET", w.serviceURL, nil)
-	if nil != err {
+	if err != nil {
 		return []WebhookDefinition{}, err
 	}
 	q := req.URL.Query()
@@ -75,19 +75,19 @@ func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	req.URL.RawQuery = q.Encode()
 
 	res, err := w.httpClient.Do(req)
-	if nil != err {
+	if err != nil {
 		return []WebhookDefinition{}, err
 	}
 	defer res.Body.Close()
 
 	b, err := ioutil.ReadAll(res.Body)
-	if nil != err {
+	if err != nil {
 		return []WebhookDefinition{}, err
 	}
 
 	var webhooks WebhookResponse
 	err = json.Unmarshal(b, &webhooks)
-	if nil != err {
+	if err != nil {
 		fmt.Println("Spec read")
 		return []WebhookDefinition{}, err
 	}
@@ -109,7 +109,7 @@ func (w *Webhooks) create(declaration Declaration) error {
 		return err
 	}
 	res, err := w.httpClient.Do(req)
-	if nil != err {
+	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
@@ -141,7 +141,7 @@ func (w *Webhooks) update(id string, declaration Declaration) error {
 		return err
 	}
 	res, err := w.httpClient.Do(req)
-	if nil != err {
+	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
@@ -164,7 +164,7 @@ func (w *Webhooks) delete(id string) error {
 		return err
 	}
 	res, err := w.httpClient.Do(req)
-	if nil != err {
+	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
