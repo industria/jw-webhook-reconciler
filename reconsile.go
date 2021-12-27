@@ -156,7 +156,7 @@ func main() {
 	webhooks := newWebhooks(*secret)
 	definitions, err := webhooks.definitions()
 	if err != nil {
-		fmt.Printf("Failed to get the webhooks from JW service \n")
+		fmt.Printf("Failed to get the webhooks from JW service %v\n", err)
 		os.Exit(1)
 	}
 
