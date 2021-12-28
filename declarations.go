@@ -38,7 +38,7 @@ func declarations(declarationFile string) ([]Declaration, error) {
 		return nil, fmt.Errorf("failed to parse %s", declarationFile)
 	}
 
-	var result []Declaration
+	var result = make([]Declaration, 0, len(declarations))
 	for name, decl := range declarations {
 		newDeclaration(name, decl)
 		result = append(result, *newDeclaration(name, decl))
