@@ -203,5 +203,4 @@ func main() {
 	} else {
 		fmt.Printf("Unknown command %s\n", cmd)
 	}
-
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
 // Hand the JSON used uppercase the suffixes would not be needed
@@ -26,18 +26,17 @@ func newDeclaration(name string, decl webhookDeclaration) *Declaration {
 	return &Declaration{name, decl.Description, decl.Events, decl.Site_ids, decl.Endpoint}
 }
 
-func declarations(declarationFile string) ([]Declaration, error) {
-	f, err := ioutil.ReadFile(declarationFile)
+func declarations(specFile string) ([]Declaration, error) {
+	f, err := os.Open(specFile)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read %s", declarationFile)
+		return nil, fmt.Errorf("unable to open file %s : %v", specFile, err)
 	}
-
+	defer f.Close()
 	var declarations map[string]webhookDeclaration
-	err = json.Unmarshal(f, &declarations)
+	err = json.NewDecoder(f).Decode(&declarations)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse %s", declarationFile)
+		return nil, fmt.Errorf("unable to decode %s : %v", specFile, err)
 	}
-
 	var result = make([]Declaration, 0, len(declarations))
 	for name, decl := range declarations {
 		newDeclaration(name, decl)
