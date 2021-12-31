@@ -80,15 +80,10 @@ func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	}
 	defer res.Body.Close()
 
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	var webhooks WebhookResponse
-	err = json.Unmarshal(b, &webhooks)
+	err = json.NewDecoder(res.Body).Decode(&webhooks)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to parse JSON response : %v", err)
 	}
 
 	return webhooks.Webhooks, nil
