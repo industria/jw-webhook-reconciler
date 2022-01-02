@@ -141,7 +141,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var _, err = os.Stat(*spec)
+	_, err := os.Stat(*spec)
 	if errors.Is(err, os.ErrNotExist) {
 		fmt.Printf("File %s not found\n", *spec)
 		os.Exit(1)
