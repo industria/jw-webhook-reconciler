@@ -71,7 +71,7 @@ func (w *Webhooks) definitions() ([]WebhookDefinition, error) {
 	}
 	q := req.URL.Query()
 	q.Add("page", "1")
-	q.Add("page_length", "250")
+	q.Add("page_length", "100")
 	req.URL.RawQuery = q.Encode()
 
 	res, err := w.httpClient.Do(req)
