@@ -1,7 +1,9 @@
 # jw-webhook-reconciler
 Reconsiler for managing webhook definitions in JW player
 
+## JW API
 
+The JW API has a 60 requests/minute per API token or IP. So if the reconciliation is run very frequently use a separate API key for the process. 
 
 ## Docker
 
