@@ -107,6 +107,23 @@ func changeSet(declarations []Declaration, definitions []WebhookDefinition) *cha
 	return &changeset{create, modify, delete}
 }
 
+// Command for flag as first argument
+func commandArgument() (string, error) {
+	if flag.NArg() == 0 {
+		return "", fmt.Errorf("missing command")
+	}
+	return flag.Args()[0], nil
+}
+
+// Specification file name if given otherwise empty
+func specificationArgument() string {
+	if flag.NArg() > 1 {
+		return flag.Args()[1]
+	} else {
+		return ""
+	}
+}
+
 func usage() {
 	fmt.Printf("Usage: %s arguments <command> [spec-file]\n", os.Args[0])
 	fmt.Printf("  command   : list, diff or apply\n")
@@ -116,27 +133,21 @@ func usage() {
 
 func main() {
 	var secret = flag.String("secret", "", "API secret to use for communicating with JW")
-	var spec = flag.String("spec", "", "Path to the specification file.")
 	flag.Usage = usage
 	flag.Parse()
 
-	if flag.NArg() == 0 {
-		fmt.Println("Missing command")
+	cmd, err := commandArgument()
+	if err != nil {
+		fmt.Println(err)
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	cmd := flag.Args()[0]
-
-	_, err := os.Stat(*spec)
-	if errors.Is(err, os.ErrNotExist) {
-		fmt.Printf("File %s not found\n", *spec)
-		os.Exit(1)
-	}
-
-	declarations, err := declarations(*spec)
+	specFile := specificationArgument()
+	declarations, err := declarations(specFile)
 	if err != nil {
-		fmt.Printf("err: %v\n", err)
+		fmt.Printf("failed to load declarations : %v\n", err)
+		flag.Usage()
 		os.Exit(1)
 	}
 

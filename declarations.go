@@ -15,6 +15,10 @@ type Declaration struct {
 }
 
 func declarations(specFile string) ([]Declaration, error) {
+	if len(specFile) == 0 {
+		return nil, fmt.Errorf("missing file name")
+	}
+
 	f, err := os.Open(specFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open file %s : %v", specFile, err)
