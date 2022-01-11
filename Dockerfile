@@ -7,7 +7,7 @@ COPY *.go ./
 
 RUN go mod download
 
-RUN go build -o /reconsile
+RUN go build -o /reconcile
 
 FROM debian:bullseye-slim AS final
 
@@ -15,12 +15,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --disabled-password --gecos "" reconsiler
+RUN adduser --disabled-password --gecos "" reconciler
 
-USER reconsiler
+USER reconciler
 
-WORKDIR /home/reconsiler
+WORKDIR /home/reconciler
 
-COPY --from=build /reconsile /home/reconsiler/reconsile
+COPY --from=build /reconcile /home/reconciler/reconcile
 
 #ENTRYPOINT ["/home/reconsiler/reconsile"]

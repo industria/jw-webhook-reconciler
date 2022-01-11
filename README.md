@@ -19,5 +19,5 @@ docker run --rm -v `pwd`:`pwd` -w `pwd` reconsile /home/reconsiler/reconsile --s
 There is a pre-build docker image available at jlindstorff/jw-webhook-reconciler:beta1 so you could just run:
 
 ```sh
-docker run --rm -v `pwd`:`pwd` -w `pwd` jlindstorff/jw-webhook-reconciler:beta1 /home/reconsiler/reconsile --secret=<secret> list spec.json
+docker run --rm -v `pwd`:`pwd` -w `pwd` jlindstorff/jw-webhook-reconciler:beta2 /home/reconciler/reconcile --secret=<secret> list spec.json
 ```
