@@ -108,8 +108,9 @@ func changeSet(declarations []Declaration, definitions []WebhookDefinition) *cha
 }
 
 func usage() {
-	fmt.Printf("Usage: %s arguments <command> \n", os.Args[0])
-	fmt.Printf("  command : list, diff or apply\n\n")
+	fmt.Printf("Usage: %s arguments <command> [spec-file]\n", os.Args[0])
+	fmt.Printf("  command   : list, diff or apply\n")
+	fmt.Printf("  spec-file : path to the specification file (only required for apply and diff\n\n")
 	flag.PrintDefaults()
 }
 
@@ -130,13 +131,14 @@ func main() {
 	flag.Parse()
 
 	if flag.NArg() == 0 {
+		fmt.Println("Missing command")
 		flag.Usage()
 		os.Exit(1)
 	}
 
 	cmd := flag.Args()[0]
 	if !validCommand(cmd) {
-		fmt.Printf("Unknown command %s \n", cmd)
+		fmt.Printf("Unknown command %s\n", cmd)
 		flag.Usage()
 		os.Exit(1)
 	}
