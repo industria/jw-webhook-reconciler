@@ -144,12 +144,6 @@ func main() {
 	}
 
 	specFile := specificationArgument()
-	declarations, err := declarations(specFile)
-	if err != nil {
-		fmt.Printf("failed to load declarations : %v\n", err)
-		flag.Usage()
-		os.Exit(1)
-	}
 
 	webhooks := newWebhooks(*secret)
 	definitions, err := webhooks.definitions()
@@ -168,6 +162,13 @@ func main() {
 		}
 		w.Flush()
 	} else if cmd == "diff" {
+		declarations, err := declarations(specFile)
+		if err != nil {
+			fmt.Printf("failed to load declarations : %v\n", err)
+			flag.Usage()
+			os.Exit(1)
+		}
+
 		changeset := changeSet(declarations, definitions)
 		fmt.Println("Create:")
 		fmt.Println(changeset.create)
@@ -179,6 +180,13 @@ func main() {
 		fmt.Println(changeset.delete)
 
 	} else if cmd == "apply" {
+		declarations, err := declarations(specFile)
+		if err != nil {
+			fmt.Printf("failed to load declarations : %v\n", err)
+			flag.Usage()
+			os.Exit(1)
+		}
+
 		changeset := changeSet(declarations, definitions)
 		for _, declaration := range changeset.create {
 			err = webhooks.create(declaration)
